@@ -57,7 +57,7 @@ pipeline {
         stage('test') {
             when{
                 expression{
-                    EXECUTE_TEST == false
+                    EXECUTE_TEST == true
                 }
             }
             steps {
