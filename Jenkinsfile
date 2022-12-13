@@ -1,6 +1,10 @@
 pipeline {
-    agent any 
-    
+    agent any
+    environment{
+        EXECUTE_RUN = false
+        EXECUTE_TEST = false
+    }
+
     triggers {
         pollSCM '* * * * *'
     }
@@ -21,13 +25,20 @@ pipeline {
                     javac hello.java
                     '''
             }
-            post {
-                always{
-                    emailext attachLog: true, body: 'build log attached', subject: '$DEFAULT_SUBJECT', to: '$DEFAULT_RECIPIENTS'
+            post{
+                success{
+                    script{
+                        EXECUTE_RUN = true   
+                    }
                 }
             }
         }
-        stage('run') { 
+        stage('run') {
+            when{
+                expression{
+                    EXECUTE_RUN == true
+                }
+            }
             steps {
                 echo "run"
                 sh '''
@@ -35,11 +46,28 @@ pipeline {
                     java HelloWorld
                     '''
             }
+            post{
+                success{
+                    script{
+                        EXECUTE_TEST = true   
+                    }
+                }
+            }
         }
-        stage('test') { 
+        stage('test') {
+            when{
+                expression{
+                    EXECUTE_TEST == false
+                }
+            }
             steps {
                 echo "test" 
             }
+        }
+    }
+    post {
+        always{
+            emailext attachLog: true, body: 'build log attached', subject: '$DEFAULT_SUBJECT', to: '$DEFAULT_RECIPIENTS'
         }
     }
 }
