@@ -17,9 +17,9 @@ pipeline {
                 ], poll: true
             }
         }
-        stage('Build') { 
+        stage('compile') { 
             steps {
-                echo "build"
+                echo "compile"
                 sh '''
                     cd /home/egesahin/Desktop/jenkins
                     javac hello.java
